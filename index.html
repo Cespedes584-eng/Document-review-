@@ -9,7 +9,18 @@
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); overflow-y: auto; color: #333; min-height: 100vh; }
         .header-top { background: var(--dark); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--green); position: sticky; top: 0; z-index: 1000; }
         .nav-btns { display: flex; gap: 10px; align-items: center; }
-        .btn-nav { background: #455a64; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85em; display: flex; align-items: center; gap: 6px; }
+       .btn-nav { 
+    background: #455a64; 
+    color: white; 
+    border: none; 
+    padding: 8px 15px; 
+    border-radius: 4px; 
+    font-weight: bold; 
+    font-size: 0.85em; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+}
         .btn-excel { background: var(--green); }
         .clock-display { font-family: monospace; background: #000; padding: 6px 12px; border-radius: 4px; border: 1px solid #444; }
         .stats-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; background: white; padding: 15px 30px; border-bottom: 1px solid #ccc; }
@@ -29,7 +40,10 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 30px; border-radius: 12px; width: 350px; text-align: center; }
         .modal-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95rem; text-align: center; box-sizing: border-box; }
-        #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1500; padding: 25px; box-sizing: border-box; flex-direction: column; overflow-y: auto; }
+        
+        /* CORRECCIÓN: Admin Panel como Capa Superior */
+        #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 3000; padding: 25px; box-sizing: border-box; flex-direction: column; overflow-y: auto; }
+        
         .tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #ddd; }
         .tab { padding: 12px 25px; cursor: pointer; background: #f0f0f0; border-radius: 8px 8px 0 0; font-weight: bold; }
         .tab.active { background: var(--green); color: white; }
@@ -49,9 +63,8 @@
             <span style="font-weight:900;">QC BR REVIEW TRACKER</span>
         </div>
         <div class="nav-btns">
-            <div class="btn-nav" style="background:#34495e">👤 MARLON (584)</div>
+            <div id="user-display" class="btn-nav" style="background:#34495e">👤 PRODUCCIÓN</div>
             <button class="btn-nav btn-excel" onclick="exportExcel()">📊 REPORTE EXCEL</button>
-            <button id="btn-admin-config" class="btn-nav" style="background:var(--blue); display: none;" onclick="toggleAdmin(true)">⚙️ PANEL Y RENDIMIENTO</button>
             <div id="reloj" class="clock-display">00:00:00</div>
         </div>
     </div>
@@ -91,10 +104,10 @@
 
     <div id="admin-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0;">Gestión y Rendimiento</h2>
-            <button onclick="toggleAdmin(false)" style="background:#e74c3c; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">CERRAR</button>
+            <h2 style="margin:0;">PANEL DE CONTROL</h2>
+            <button onclick="toggleAdmin(false)" class="btn" style="width:120px; background:#e74c3c; color:white; margin:0;">CERRAR</button>
         </div>
-        
+
         <div class="tabs">
             <div id="tab-perf" class="tab active" onclick="switchTab('perf')">📈 RENDIMIENTO</div>
             <div id="tab-edit" class="tab" onclick="switchTab('edit')">🛠️ EDITAR LOTES</div>
@@ -102,10 +115,10 @@
         
         <div id="view-perf">
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
-                <input type="text" id="perf-search" oninput="renderPerf()" placeholder="🔍 Filtrar por Línea, Inspector o Lote..." class="search-bar" style="margin-bottom:0;">
-                <button onclick="exportExcel()" class="btn btn-excel" style="width:200px; margin-top:0;">📥 DESCARGAR EXCEL</button>
+                <input type="text" id="perf-search" oninput="renderPerf()" placeholder="🔍 Filtrar..." class="search-bar" style="margin-bottom:0;">
+                <button onclick="exportExcel()" class="btn btn-excel" style="width:200px; margin-top:0;">📥 EXCEL</button>
             </div>
-            <div style="overflow-y:auto; height:60vh; border:1px solid #ddd;">
+            <div style="overflow-y:auto; height:65vh; border:1px solid #ddd;">
                 <table>
                     <thead><tr><th>Fecha</th><th>Hora Fin</th><th>Lote</th><th>Línea</th><th>Inspector</th><th>Págs</th><th>Tiempo Rev</th></tr></thead>
                     <tbody id="perf-body"></tbody>
@@ -115,7 +128,7 @@
 
         <div id="view-edit" style="display:none;">
             <input type="text" id="adm-search" oninput="renderAdmin()" placeholder="🔍 Buscar por Lote..." class="search-bar">
-            <div style="overflow-y:auto; height:60vh; border:1px solid #ddd;">
+            <div style="overflow-y:auto; height:65vh; border:1px solid #ddd;">
                 <table>
                     <thead><tr><th>Fecha</th><th>Lote</th><th>Línea</th><th>Inspector</th><th>Págs</th><th>Acción</th></tr></thead>
                     <tbody id="adm-body"></tbody>
@@ -124,282 +137,305 @@
         </div>
     </div>
 
-   <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymrLCk5xdsQixB9ZE-veFeeFWEU0aahtKmcz9pUMSl1pO9txoivC8t7MCzzbi0c2kNFA/exec";
-        const lineas = ["SOFIA 6F L1", "SOFIA 6F L2", "SOFIA 5F L2", "SOFIA 6F L3", "SOFIA EX", "SOFIA 5F", "VIA", "HW 27", "SCEPTER", "HW LONG", "HW SHORT", "REGULAR L2", "HW 21 +", "HW REGULAR"];
-        let db = []; let tempIdx = null;
+<script>
+    const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbz1rIk8kPJR_Te_sfD_Q18qz2KM0TnT4Vu1duQAiSaTOW2ydmOxx_IPFjA27BmNAKXb0g/exec";
+    const lineas = ["SOFIA 6F L1", "SOFIA 6F L2", "SOFIA 5F L2", "SOFIA 6F L3", "SOFIA EX", "SOFIA 5F", "VIA", "HW 27", "SCEPTER", "HW LONG", "HW SHORT", "REGULAR L2", "HW 21 +", "HW REGULAR"];
+    let db = []; 
+    let tempIdx = null;
 
-        async function init() {
-                       const sel = document.getElementById('new-line');
+    async function init() {
+        let nombreDetectado = "PRODUCCIÓN";
+        document.getElementById('user-display').innerText = `👤 ${nombreDetectado.toUpperCase()}`;
+
+        const sel = document.getElementById('new-line');
+        if (sel) {
             sel.innerHTML = "";
             lineas.sort().forEach(l => { sel.innerHTML += `<option value="${l}">${l}</option>`; });
-            document.getElementById('main-date-filter').valueAsDate = new Date();
-
-            const localData = localStorage.getItem('qc_final_v88');
-            if (localData) { db = JSON.parse(localData); render(); }
-
-            try {
-                const response = await fetch(SCRIPT_URL);
-                const data = await response.json();
-                if(data && Array.isArray(data)) {
-                    db = data.map(item => ({
-                        id: item.id,
-                        line: item.line || item.linea,
-                        user: item.user || "SIN ASIGNAR",
-                        st: item.st,
-                        inicioWS: item.inicioWS || null,
-                        inicioRS: item.inicioRS || null,
-                        inicioCS: item.inicioCS || null,
-                        tR_acumulado: item.tR_acumulado || 0,
-                        tC_acumulado: item.tC_acumulado || 0,
-                        tW: item.tw || 0,
-                        tR: item.tr || 0,
-                        tC: item.tc || 0,
-                        date: formatearFecha(item.date),
-                        pg: item.pg || 0,
-                        hFin: item.hfin || ""
-                    }));
-                    localStorage.setItem('qc_final_v88', JSON.stringify(db));
-                    render();
-                }
-            } catch (e) { 
-                console.error("Error nube:", e); 
-            }
-        } 
-
-        function updateTimers() {
-            db.forEach((l, i) => {
-                if (l.st === 'done') return;
-                
-                const mainTimer = document.getElementById(`live-${i}`);
-                if (mainTimer) {
-                    const displayTime = (l.st === 'wait') ? l.tW : (l.st === 'rev' ? l.tR : l.tC);
-                    mainTimer.innerText = fmt(displayTime);
-                }
-
-                const grid = document.getElementById(`grid-${i}`);
-                if (grid) {
-                    grid.innerHTML = `
-                        <div class="t-item"><span class="t-lbl">ESPERA</span>${fmt(l.tW)}</div>
-                        <div class="t-item"><span class="t-lbl">REV</span>${fmt(l.tR)}</div>
-                        <div class="t-item"><span class="t-lbl">CORR</span>${fmt(l.tC)}</div>
-                    `;
-                }
-            });
         }
-
-       function tick() {
-            const ahora = Date.now();
-            db.forEach(l => {
-                if (l.st === 'done') return; 
-                if (l.st === 'wait' && l.inicioWS) l.tW = ahora - l.inicioWS;
-                if (l.st === 'rev' && l.inicioRS) l.tR = (ahora - l.inicioRS) + (l.tR_acumulado || 0);
-                if (l.st === 'corr' && l.inicioCS) l.tC = (ahora - l.inicioCS) + (l.tC_acumulado || 0);
-            });
-            updateTimers(); 
-            document.getElementById('reloj').innerText = new Date().toLocaleTimeString();
-        }
-
-        function formatearFecha(f) {
-            if(!f) return new Date().toISOString().split('T')[0];
-            const d = new Date(f);
-            return isNaN(d) ? f : d.toISOString().split('T')[0];
-        }
-
-        function fmt(ms) {
-            if (isNaN(ms) || ms === null || ms < 0) return "00:00";
-            const totalSegundos = Math.floor(ms / 1000);
-            const horas = Math.floor(totalSegundos / 3600);
-            const minutos = Math.floor((totalSegundos % 3600) / 60);
-            const segundos = totalSegundos % 60;
-            if (horas > 0) return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-            return `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-        }
-
-       function render() {
-            const cont = { wait: document.getElementById('list-wait'), run: document.getElementById('list-run'), done: document.getElementById('list-done') };
-            const count = { wait: 0, run: 0, done: 0 };
-            Object.values(cont).forEach(c => c.innerHTML = "");
-            
-            const selDate = document.getElementById('main-date-filter').value;
-            let topB = 0, topP = 0;
-
-            [...db].reverse().forEach((l) => {
-                const originalIdx = db.indexOf(l);
-                if (l.date !== selDate) return; 
-
-                const isFinalizado = (l.st === 'done');
-                if(isFinalizado) { topB++; topP += parseInt(l.pg || 0); }
-                
-                const card = `
-                <div class="card">
-                    <div style="font-weight:bold; font-size:1.1em;">${l.id}</div>
-                    <div style="font-size:0.75em; color:#666; margin-bottom:8px;">${l.line} | ${l.user}</div>
-                    ${isFinalizado ? '<span class="status-final">FINALIZADO</span>' : `<span class="timer-big" id="live-${originalIdx}">00:00</span>`}
-                    <div class="timer-grid-3" id="grid-${originalIdx}">
-                        <div class="t-item"><span class="t-lbl">ESPERA</span>${fmt(l.tW)}</div>
-                        <div class="t-item"><span class="t-lbl">REV</span>${fmt(l.tR)}</div>
-                        <div class="t-item"><span class="t-lbl">CORR</span>${fmt(l.tC)}</div>
-                    </div>
-                    ${l.st === 'wait' ? `<button class="btn" style="background:var(--green); color:white" onclick="changeSt(${originalIdx},'rev')">INICIAR</button>` : 
-                      l.st === 'rev' ? `<button class="btn" style="background:#f39c12; color:white; margin-bottom:5px;" onclick="changeSt(${originalIdx},'corr')">CORRECCIÓN</button><button class="btn" style="background:var(--dark); color:white" onclick="openFin(${originalIdx})">FINALIZAR</button>` : 
-                      l.st === 'corr' ? `<button class="btn" style="background:var(--green); color:white" onclick="changeSt(${originalIdx},'rev')">REANUDAR</button>` : 
-                      `<div style="text-align:center; font-weight:bold; color:var(--green); padding-top:5px;">PÁGINAS: ${l.pg}</div>`}
-                </div>`;
-                
-                if (l.st === 'wait') { cont.wait.innerHTML += card; count.wait++; }
-                else if (l.st === 'done') { cont.done.innerHTML += card; count.done++; }
-                else { cont.run.innerHTML += card; count.run++; }
-            });
-
-            document.getElementById('top-brs').innerText = topB; 
-            document.getElementById('top-pags').innerText = topP;
-            document.getElementById('c-wait').innerText = count.wait; 
-            document.getElementById('c-run').innerText = count.run; 
-            document.getElementById('c-done').innerText = count.done;
-        }
-
-function changeSt(i, s) { 
-    const ahora = Date.now();
-    const lote = db[i];
-    
-    // Guardar acumulados antes de cambiar estado
-    if (lote.st === 'rev' && lote.inicioRS) lote.tR_acumulado = (ahora - lote.inicioRS) + (lote.tR_acumulado || 0);
-    if (lote.st === 'corr' && lote.inicioCS) lote.tC_acumulado = (ahora - lote.inicioCS) + (lote.tC_acumulado || 0);
-    
-    lote.st = s;
-    
-    if (s === 'rev') {
-        lote.inicioRS = ahora;
-        // Lógica de asignación: solo pregunta si no tiene dueño
-        if (lote.user === "SIN ASIGNAR" || !lote.user) {
-            const nombre = prompt("¿Quién está revisando este lote?", "MARLON");
-            lote.user = nombre ? nombre.toUpperCase() : "SIN ASIGNAR";
-        }
-    } else if (s === 'corr') {
-        lote.inicioCS = ahora;
-    }
-    save();
-}
-
-function openFin(i) { tempIdx = i; showModal('modal-finish'); }
-
-function confirmFinish() {
-    const p = document.getElementById('finish-pg').value;
-    if(p) { 
-        db[tempIdx].pg = p; 
-        db[tempIdx].st = 'done'; 
-        db[tempIdx].hFin = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        save(); 
-        hideModal('modal-finish'); 
-        document.getElementById('finish-pg').value = ""; 
-    }
-}
-
-function addBR() {
-    const id = document.getElementById('new-id').value; 
-    if(!id) return;
-    const ahora = Date.now();
-    db.push({ 
-        id: id, 
-        line: document.getElementById('new-line').value, 
-        user: "SIN ASIGNAR", 
-        st: 'wait', 
-        inicioWS: ahora, 
-        inicioRS: null, 
-        inicioCS: null, 
-        tW: 0, tR: 0, tC: 0,
-        tR_acumulado: 0, 
-        tC_acumulado: 0, 
-        date: new Date().toISOString().split('T')[0], 
-        pg: 0, 
-        hFin: "" 
-    });
-    document.getElementById('new-id').value = ""; 
-    hideModal('modal-new'); 
-    save(); 
-}
-
-        async function save() { 
-            render(); 
-            localStorage.setItem('qc_final_v88', JSON.stringify(db)); 
-            try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(db) }); } catch (e) { console.error("Error nube", e); }
-        }
-
-        function renderAdmin() {
-            const b = document.getElementById('adm-body'); const s = document.getElementById('adm-search').value.toLowerCase(); b.innerHTML = "";
-            [...db].reverse().forEach((l) => {
-                if(l.id.toString().toLowerCase().includes(s)) {
-                    const originalIdx = db.indexOf(l);
-                    b.innerHTML += `<tr><td>${l.date} <span class="pencil" onclick="edit(${originalIdx},'date')">✏️</span></td><td>${l.id} <span class="pencil" onclick="edit(${originalIdx},'id')">✏️</span></td><td>${l.line} <span class="pencil" onclick="editLine(${originalIdx})">✏️</span></td><td>${l.user} <span class="pencil" onclick="edit(${originalIdx},'user')">✏️</span></td><td>${l.pg} <span class="pencil" onclick="edit(${originalIdx},'pg')">✏️</span></td><td><button onclick="del(${originalIdx})" style="background:none; border:none; cursor:pointer;">🗑️</button></td></tr>`;
-                }
-            });
-        }
-
-      function renderPerf() {
-    const b = document.getElementById('perf-body'); 
-    const s = document.getElementById('perf-search').value.toLowerCase(); 
-    b.innerHTML = "";
-
-    [...db].reverse().filter(l => l.st === 'done' && 
-        (l.user.toLowerCase().includes(s) || l.line.toLowerCase().includes(s) || l.id.toString().toLowerCase().includes(s))
-    ).forEach(l => {
         
-        // --- LIMPIEZA DE HORA ---
-        let horaLimpia = l.hFin || "--:--";
-        if (horaLimpia.includes('T')) {
-            // Si viene como 1899-12-30T22:39:04.000Z, saca solo "22:39"
-            horaLimpia = horaLimpia.split('T')[1].substring(0, 5);
+        document.getElementById('main-date-filter').value = formatearFecha();
+
+        const localData = localStorage.getItem('qc_final_v88');
+        if (localData) { db = JSON.parse(localData); render(); }
+        await refreshData();
+    }
+
+    async function refreshData() {
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const data = await response.json();
+            
+            if(data && Array.isArray(data)) {
+                const cloudData = data.filter(item => item && (item.id || item.line)).map(item => ({
+                    id: item.id || "S/N",
+                    line: item.line || item.linea || "S/L",
+                    user: item.user || item.usuario || "SIN ASIGNAR",
+                    st: item.st || "wait",
+                    inicioWS: Number(item.inicioWS) || null,
+                    inicioRS: Number(item.inicioRS) || null,
+                    inicioCS: Number(item.inicioCS) || null,
+                    tR_acumulado: Number(item.tR_acumulado) || 0,
+                    tC_acumulado: Number(item.tC_acumulado) || 0,
+                    tW: Number(item.tw || item.tW) || 0,
+                    tR: Number(item.tr || item.tR) || 0,
+                    tC: Number(item.tc || item.tC) || 0,
+                    date: item.date ? (typeof item.date === 'string' ? item.date.split('T')[0] : formatearFecha(item.date)) : formatearFecha(),
+                    pg: Number(item.pg) || 0,
+                    hFin: item.hfin || item.hFin || ""
+                }));
+
+                db = cloudData.sort((a, b) => {
+                    if (b.date !== a.date) return b.date.localeCompare(a.date);
+                    return a.id.toString().localeCompare(b.id.toString(), undefined, {numeric: true});
+                });
+
+                localStorage.setItem('qc_final_v88', JSON.stringify(db));
+                render();
+            }
+        } catch (e) { console.error("Error al sincronizar:", e); }
+    }
+
+    function tick() {
+        const ahora = Date.now();
+        db.forEach(l => {
+            if (l.st === 'done') return; 
+            if (l.st === 'wait' && l.inicioWS) l.tW = ahora - l.inicioWS;
+            if (l.st === 'rev' && l.inicioRS) l.tR = (ahora - l.inicioRS) + (l.tR_acumulado || 0);
+            if (l.st === 'corr' && l.inicioCS) l.tC = (ahora - l.inicioCS) + (l.tC_acumulado || 0);
+        });
+        updateTimers(); 
+        document.getElementById('reloj').innerText = new Date().toLocaleTimeString();
+    }
+
+    function updateTimers() {
+        db.forEach((l, i) => {
+            if (l.st === 'done') return;
+            const mainTimer = document.getElementById(`live-${i}`);
+            if (mainTimer) {
+                const displayTime = (l.st === 'wait') ? l.tW : (l.st === 'rev' ? l.tR : l.tC);
+                mainTimer.innerText = fmt(displayTime);
+            }
+            const grid = document.getElementById(`grid-${i}`);
+            if (grid) {
+                grid.innerHTML = `
+                    <div class="t-item"><span class="t-lbl">ESPERA</span>${fmt(l.tW)}</div>
+                    <div class="t-item"><span class="t-lbl">REV</span>${fmt(l.tR)}</div>
+                    <div class="t-item"><span class="t-lbl">CORR</span>${fmt(l.tC)}</div>
+                `;
+            }
+        });
+    }
+
+    function formatearFecha(f) {
+        const d = f ? new Date(f) : new Date();
+        if (isNaN(d)) return f;
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function fmt(ms) {
+        if (isNaN(ms) || ms === null || ms < 0) return "00:00";
+        const totalSegundos = Math.floor(ms / 1000);
+        const horas = Math.floor(totalSegundos / 3600);
+        const minutos = Math.floor((totalSegundos % 3600) / 60);
+        const segundos = totalSegundos % 60;
+        if (horas > 0) return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+        return `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+    }
+
+    function render() {
+        const cont = { wait: document.getElementById('list-wait'), run: document.getElementById('list-run'), done: document.getElementById('list-done') };
+        const count = { wait: 0, run: 0, done: 0 };
+        Object.values(cont).forEach(c => c.innerHTML = "");
+        
+        const selDate = document.getElementById('main-date-filter').value;
+        let topB = 0, topP = 0;
+
+        [...db].reverse().forEach((l) => {
+            const originalIdx = db.indexOf(l);
+            if (l.date !== selDate) return; 
+
+            const isFinalizado = (l.st === 'done');
+            if(isFinalizado) { topB++; topP += parseInt(l.pg || 0); }
+            
+            const card = `
+            <div class="card" style="position: relative;">
+                ${isFinalizado ? (() => {
+                    let h = l.hFin || '--:--';
+                    if (h.includes('T')) h = h.split('T')[1].substring(0, 5);
+                    else if (h.length > 8) h = h.substring(0, 5);
+                    return `<div style="position: absolute; top: 10px; right: 15px; background: #f0f4f1; color: #468e5d; padding: 4px 8px; border-radius: 6px; font-size: 0.85em; font-weight: bold; border: 1px solid #d1e2d4;">🕒 ${h}</div>`;
+                })() : ''}
+
+                <div style="font-weight:bold; font-size:1.1em;">${l.id}</div>
+                <div style="font-size:0.75em; color:#666; margin-bottom:8px;">
+                    ${l.line} | <b style="color:var(--blue);" id="user-card-${originalIdx}">${l.user}</b>
+                </div>
+
+                ${isFinalizado 
+                    ? `<span class="status-final" style="margin: 10px 0; display: block;">FINALIZADO</span>` 
+                    : `<span class="timer-big" id="live-${originalIdx}">00:00</span>`
+                }
+
+                <div class="timer-grid-3" id="grid-${originalIdx}">
+                    <div class="t-item"><span class="t-lbl">ESPERA</span>${fmt(l.tW)}</div>
+                    <div class="t-item"><span class="t-lbl">REV</span>${fmt(l.tR)}</div>
+                    <div class="t-item"><span class="t-lbl">CORR</span>${fmt(l.tC)}</div>
+                </div>
+
+                ${l.st === 'wait' ? 
+                    `<div style="text-align:center; font-weight:bold; color:#e67e22; padding:10px; background:#fef5e7; border-radius:6px; border: 1px solid #faebcc;">⌛ EN ESPERA</div>` : 
+                  l.st === 'rev' ? 
+                    `<div style="text-align:center; font-weight:bold; color:var(--blue); padding:10px; background:#ebf5fb; border-radius:6px; border: 1px solid #d9edf7;">🔍 EN REVISIÓN...</div>` : 
+                  l.st === 'corr' ? 
+                    `<div style="text-align:center; font-weight:bold; color:#e74c3c; padding:10px; background:#fdedec; border-radius:6px; border: 1px solid #ebccd1;">⚠️ EN CORRECCIÓN</div>` : 
+                    `<div style="text-align:center; font-weight:bold; color:var(--green); padding:8px; border-top:1px solid #eee;">PÁGINAS REVISADAS: ${l.pg}</div>`
+                }
+            </div>`;
+            
+            if (l.st === 'wait') { cont.wait.innerHTML += card; count.wait++; }
+            else if (l.st === 'done') { cont.done.innerHTML += card; count.done++; }
+            else { cont.run.innerHTML += card; count.run++; }
+        });
+
+        document.getElementById('top-brs').innerText = topB; 
+        document.getElementById('top-pags').innerText = topP;
+        document.getElementById('c-wait').innerText = count.wait; 
+        document.getElementById('c-run').innerText = count.run; 
+        document.getElementById('c-done').innerText = count.done;
+    }
+
+    async function changeSt(i, s) { 
+        const ahora = Date.now();
+        const lote = db[i];
+        if (lote.st === 'wait' && s === 'rev') {
+            const display = document.getElementById('user-display').innerText;
+            lote.user = display.replace('👤 ', '').trim().toUpperCase();
         }
+        if (lote.st === 'rev' && lote.inicioRS) lote.tR_acumulado = (ahora - lote.inicioRS) + (lote.tR_acumulado || 0);
+        if (lote.st === 'corr' && lote.inicioCS) lote.tC_acumulado = (ahora - lote.inicioCS) + (lote.tC_acumulado || 0);
+        
+        lote.st = s;
+        if (s === 'rev') lote.inicioRS = ahora;
+        else if (s === 'corr') lote.inicioCS = ahora;
+        
+        await save();
+        await refreshData(); 
+    }
 
-        b.innerHTML += `
-            <tr>
-                <td>${l.date}</td>
-                <td>${horaLimpia}</td>
-                <td>${l.id}</td>
-                <td>${l.line}</td>
-                <td>${l.user}</td>
-                <td>${l.pg}</td>
-                <td>${fmt(l.tR)}</td>
-            </tr>`;
-    });
-}
+    async function save() { 
+        localStorage.setItem('qc_final_v88', JSON.stringify(db)); 
+        render(); 
+        try { 
+            await fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify(db) 
+            });
+        } catch (e) { console.error("Error de conexión", e); }
+    }
 
-        function exportExcel() {
-    let csv = "\uFEFFFecha;Hora_Fin;Lote;Linea;Inspector;Paginas;T_Espera;T_Revision;T_Correccion\n";
+    function renderAdmin() {
+        const b = document.getElementById('adm-body'); 
+        const s = document.getElementById('adm-search').value.toLowerCase(); 
+        b.innerHTML = "";
+        [...db].reverse().forEach((l) => {
+            if(l.id.toString().toLowerCase().includes(s)) {
+                const originalIdx = db.indexOf(l);
+                b.innerHTML += `<tr><td>${l.date} <span class="pencil" onclick="edit(${originalIdx},'date')">✏️</span></td><td>${l.id} <span class="pencil" onclick="edit(${originalIdx},'id')">✏️</span></td><td>${l.line} <span class="pencil" onclick="editLine(${originalIdx})">✏️</span></td><td>${l.user} <span class="pencil" onclick="edit(${originalIdx},'user')">✏️</span></td><td>${l.pg} <span class="pencil" onclick="edit(${originalIdx},'pg')">✏️</span></td><td><button onclick="del(${originalIdx})" style="background:none; border:none; cursor:pointer;">🗑️</button></td></tr>`;
+            }
+        });
+    }
+
+    function renderPerf() {
+        const b = document.getElementById('perf-body'); 
+        const s = document.getElementById('perf-search').value.toLowerCase(); 
+        b.innerHTML = "";
+        [...db].reverse().filter(l => l.st === 'done' && (l.user.toLowerCase().includes(s) || l.line.toLowerCase().includes(s) || l.id.toString().toLowerCase().includes(s))).forEach(l => {
+            let h = l.hFin || "--:--";
+            if (h.includes('T')) h = h.split('T')[1].substring(0, 5);
+            b.innerHTML += `<tr><td>${l.date}</td><td>${h}</td><td>${l.id}</td><td>${l.line}</td><td>${l.user}</td><td>${l.pg}</td><td>${fmt(l.tR)}</td></tr>`;
+        });
+    }
+
+    function exportExcel() {
+        let csv = "\uFEFFFecha;Hora_Fin;Lote;Linea;Inspector;Paginas;T_Espera;T_Revision;T_Correccion\n";
+        db.filter(l => l.st === 'done').forEach(l => {
+            let horaLimpia = l.hFin || "";
+            if (horaLimpia.includes('T')) horaLimpia = horaLimpia.split('T')[1].substring(0, 5);
+            csv += `${l.date};${horaLimpia};${l.id};${l.line};${l.user};${l.pg};${fmt(l.tW)};${fmt(l.tR)};${fmt(l.tC)}\n`; 
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a"); 
+        link.href = URL.createObjectURL(blob);
+        link.download = `REPORTE_QC_${formatearFecha()}.csv`; 
+        link.click();
+    }
+
+    function edit(i, f) { const n = prompt("Nuevo:", db[i][f]); if(n !== null) { db[i][f] = f==='pg'?parseInt(n):n; save(); renderAdmin(); } }
+    function editLine(i) {
+        let list = "Línea:\n"; lineas.forEach((l, x) => list += `${x}: ${l}\n`);
+        const choice = prompt(list); if(choice !== null && lineas[choice]) { db[i].line = lineas[choice]; save(); renderAdmin(); }
+    }
+    function del(i) { if(confirm("¿Borrar?")) { db.splice(i,1); save(); renderAdmin(); } }
+    function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function hideModal(id) { document.getElementById(id).style.display = 'none'; }
     
-    db.filter(l => l.st === 'done').forEach(l => {
-        // --- LIMPIEZA NÍTIDA ---
-        let h = l.hFin || "";
-        if (h.includes('T')) h = h.split('T')[1].substring(0, 5);
+    // FUNCIÓN MEJORADA: Muestra el panel como modal completo
+    function toggleAdmin(v) { 
+        document.getElementById('admin-panel').style.display = v?'flex':'none'; 
+        if(v) renderPerf(); 
+    }
+    
+    function switchTab(t) {
+        document.getElementById('view-edit').style.display = t==='edit'?'block':'none';
+        document.getElementById('view-perf').style.display = t==='perf'?'block':'none';
+        document.getElementById('tab-edit').className = t==='edit'?'tab active':'tab';
+        document.getElementById('tab-perf').className = t==='perf'?'tab active':'tab';
+        if(t==='perf') renderPerf(); else renderAdmin();
+    }
 
-        csv += `${l.date};${h};${l.id};${l.line};${l.user};${l.pg};${fmt(l.tW)};${fmt(l.tR)};${fmt(l.tC)}\n`; 
-    });
+    async function addBR() {
+        const id = document.getElementById('new-id').value.trim();
+        const line = document.getElementById('new-line').value;
+        const date = document.getElementById('main-date-filter').value;
+        if (!id) return alert("Ingrese número de lote");
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a"); 
-    link.href = URL.createObjectURL(blob);
-    link.download = `REPORTE_QC_${new Date().toISOString().split('T')[0]}.csv`; 
-    link.click();
-}
+        const nuevoLote = {
+            id: id, line: line, user: "SIN ASIGNAR", st: 'wait',
+            date: date, inicioWS: Date.now(), tW: 0, tR: 0, tC: 0,
+            tR_acumulado: 0, tC_acumulado: 0, pg: 0, hFin: ""
+        };
+        db.push(nuevoLote);
+        document.getElementById('new-id').value = "";
+        hideModal('modal-new');
+        await save();
+        await refreshData();
+    }
 
-        function edit(i, f) { const n = prompt("Nuevo:", db[i][f]); if(n !== null) { db[i][f] = f==='pg'?parseInt(n):n; save(); renderAdmin(); } }
-        function editLine(i) {
-            let list = "Línea:\n"; lineas.forEach((l, x) => list += `${x}: ${l}\n`);
-            const choice = prompt(list); if(choice !== null && lineas[choice]) { db[i].line = lineas[choice]; save(); renderAdmin(); }
-        }
-        function del(i) { if(confirm("¿Borrar?")) { db.splice(i,1); save(); renderAdmin(); } }
-        function showModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function hideModal(id) { document.getElementById(id).style.display = 'none'; }
-        function toggleAdmin(v) { document.getElementById('admin-panel').style.display = v?'flex':'none'; if(v) renderPerf(); }
-        function switchTab(t) {
-            document.getElementById('view-edit').style.display = t==='edit'?'block':'none';
-            document.getElementById('view-perf').style.display = t==='perf'?'block':'none';
-            document.getElementById('tab-edit').className = t==='edit'?'tab active':'tab';
-            document.getElementById('tab-perf').className = t==='perf'?'tab active':'tab';
-            if(t==='perf') renderPerf(); else renderAdmin();
-        }
-        setInterval(tick, 1000);
-    </script>
+    function openFin(i) { tempIdx = i; showModal('modal-finish'); document.getElementById('finish-pg').focus(); }
+
+    async function confirmFinish() {
+        const p = document.getElementById('finish-pg').value;
+        if (!p || p <= 0) return alert("Ingrese total de páginas");
+        const lote = db[tempIdx];
+        lote.pg = p;
+        lote.st = 'done';
+        const ahora = new Date();
+        lote.hFin = `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
+        const ahoraMs = Date.now();
+        if (lote.inicioRS) lote.tR_acumulado = (ahoraMs - lote.inicioRS) + (lote.tR_acumulado || 0);
+        lote.tR = lote.tR_acumulado;
+        hideModal('modal-finish');
+        document.getElementById('finish-pg').value = "";
+        await save();
+        await refreshData();
+    }
+
+    setInterval(tick, 1000); 
+    setInterval(refreshData, 5000); // MEJORA: Sincronización cada 5 segundos
+</script>
 </body>
 </html>
