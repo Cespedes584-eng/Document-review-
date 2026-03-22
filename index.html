@@ -112,30 +112,39 @@
         const id = document.getElementById('new-id').value.trim();
         const line = document.getElementById('new-line').value;
         
-        // Genera la fecha en formato DD/MM/AAAA o similar según tu región
-        const fechaHoy = new Date().toLocaleDateString('es-CR'); 
+        // --- FORMATO ISO: 2026-03-21 ---
+        // Esto genera exactamente el formato que ves en tu base de datos
+        const fechaHoy = new Date().toISOString().split('T')[0]; 
 
-        if(!id) return alert("Ingrese un número de lote");
+        if(!id) {
+            alert("Ingrese un número de lote");
+            return;
+        }
 
         const nuevo = {
-            id, 
-            line, 
-            user: "POR DEFINIR", 
-            st: 'wait',
-            date: fechaHoy, // <--- AQUÍ ESTÁ EL CAMBIO
-            inicioWS: Date.now(), 
-            tW:0, tR:0, tC:0, 
-            tR_acumulado:0, tC_acumulado:0, 
-            pg:0,
-            lastUpdate: Date.now()
+            id: id,
+            line: line,
+            user: "POR DEFINIR",
+            st: "wait",
+            date: fechaHoy, // Guardará: 2026-03-21
+            inicioWS: Date.now(),
+            tW: 0, 
+            tR: 0, 
+            tC: 0,
+            tR_acumulado: 0, 
+            tC_acumulado: 0,
+            pg: 0,
+            lastUpdate: firebase.database.ServerValue.TIMESTAMP
         };
 
         try {
             await rtdb.ref('recursos/' + id).set(nuevo);
             hideModal();
             document.getElementById('new-id').value = "";
+            // Confirmación opcional en consola
+            console.log("Lote registrado con fecha ISO:", fechaHoy);
         } catch (e) {
-            alert("Error al guardar: " + e.message);
+            alert("Error de Firebase: " + e.message);
         }
     }
 
