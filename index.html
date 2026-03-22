@@ -108,31 +108,27 @@
     }
 
     // --- SEGURIDAD: Solo permite registrar si la fecha es hoy ---
-   async function addBR() {
+  async function addBR() {
         const id = document.getElementById('new-id').value.trim();
         const line = document.getElementById('new-line').value;
         
-        // --- FORMATO ISO: 2026-03-21 ---
-        // Esto genera exactamente el formato que ves en tu base de datos
-        const fechaHoy = new Date().toISOString().split('T')[0]; 
+        // --- SOLUCIÓN PARA COSTA RICA (Evita el salto de día) ---
+        const ahora = new Date();
+        const offset = ahora.getTimezoneOffset() * 60000; // Ajuste de zona horaria
+        const fechaLocal = new Date(ahora - offset).toISOString().split('T')[0];
+        // -------------------------------------------------------
 
-        if(!id) {
-            alert("Ingrese un número de lote");
-            return;
-        }
+        if(!id) return alert("Ingrese un número de lote");
 
         const nuevo = {
             id: id,
             line: line,
             user: "POR DEFINIR",
             st: "wait",
-            date: fechaHoy, // Guardará: 2026-03-21
+            date: fechaLocal, // Ahora guardará 2026-03-21 aunque sea de noche
             inicioWS: Date.now(),
-            tW: 0, 
-            tR: 0, 
-            tC: 0,
-            tR_acumulado: 0, 
-            tC_acumulado: 0,
+            tW: 0, tR: 0, tC: 0,
+            tR_acumulado: 0, tC_acumulado: 0,
             pg: 0,
             lastUpdate: firebase.database.ServerValue.TIMESTAMP
         };
@@ -141,10 +137,9 @@
             await rtdb.ref('recursos/' + id).set(nuevo);
             hideModal();
             document.getElementById('new-id').value = "";
-            // Confirmación opcional en consola
-            console.log("Lote registrado con fecha ISO:", fechaHoy);
+            console.log("Registrado con fecha local corregida:", fechaLocal);
         } catch (e) {
-            alert("Error de Firebase: " + e.message);
+            alert("Error: " + e.message);
         }
     }
 
