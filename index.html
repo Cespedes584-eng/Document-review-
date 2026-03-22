@@ -108,22 +108,35 @@
     }
 
     // --- SEGURIDAD: Solo permite registrar si la fecha es hoy ---
-    async function addBR() {
+   async function addBR() {
         const id = document.getElementById('new-id').value.trim();
         const line = document.getElementById('new-line').value;
-        const hoy = new Date().toISOString().split('T')[0];
+        
+        // Genera la fecha en formato DD/MM/AAAA o similar según tu región
+        const fechaHoy = new Date().toLocaleDateString('es-CR'); 
 
         if(!id) return alert("Ingrese un número de lote");
 
         const nuevo = {
-            id, line, user: "POR DEFINIR", st: 'wait',
-            date: hoy,
-            inicioWS: Date.now(), tW:0, tR:0, tC:0, tR_acumulado:0, tC_acumulado:0, pg:0,
+            id, 
+            line, 
+            user: "POR DEFINIR", 
+            st: 'wait',
+            date: fechaHoy, // <--- AQUÍ ESTÁ EL CAMBIO
+            inicioWS: Date.now(), 
+            tW:0, tR:0, tC:0, 
+            tR_acumulado:0, tC_acumulado:0, 
+            pg:0,
             lastUpdate: Date.now()
         };
 
-        await rtdb.ref('recursos/' + id).set(nuevo);
-        hideModal();
+        try {
+            await rtdb.ref('recursos/' + id).set(nuevo);
+            hideModal();
+            document.getElementById('new-id').value = "";
+        } catch (e) {
+            alert("Error al guardar: " + e.message);
+        }
     }
 
     function tick() {
