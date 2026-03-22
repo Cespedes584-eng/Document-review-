@@ -3,38 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC Monitor Pro</title>
+    <title>QC Monitor Pro - Tiempos Completos</title>
     <style>
         :root { --dark: #24303c; --green: #468e5d; --blue: #3498db; --bg: #ebedef; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); color: #333; }
         
-        /* Header Principal */
+        /* Header & Stats */
         .header-top { background: var(--dark); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--green); }
         .clock-display { font-family: monospace; background: #000; padding: 6px 12px; border-radius: 4px; color: #0f0; }
-
-        /* Barra de Estadísticas (Idéntica a tu imagen) */
         .stats-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; background: white; padding: 15px 0; border-bottom: 1px solid #ccc; text-align: center; }
         .stat-item { border-right: 2px solid var(--green); }
         .stat-item:last-child { border-right: none; }
         .stat-label { display: block; font-size: 0.9em; font-weight: bold; color: #666; margin-bottom: 5px; }
         .stat-value { font-size: 2.2em; font-weight: 900; color: #333; }
-        .date-picker { border: none; font-size: 1.2em; font-weight: 900; cursor: pointer; color: #333; text-align: center; }
+        .date-picker { border: none; font-size: 1.2em; font-weight: 900; cursor: pointer; color: #333; text-align: center; background: transparent; }
 
-        /* Barra de Búsqueda */
+        /* Search */
         .search-container { background: #f4f5f7; padding: 10px 20px; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 900; }
-        .search-box { width: 100%; padding: 12px 40px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1em; background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%233498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 12px center; }
+        .search-box { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1em; }
 
         /* Workspace */
         .workspace { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 15px; padding: 15px; }
         .col { background: #d1d4d7; border-radius: 8px; padding: 10px; min-height: 70vh; border: 1px solid #bcbcbc; }
         .col-header { background: #34495e; color: white; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-weight: bold; text-align: center; text-transform: uppercase; }
         
-        /* Cards */
-        .card { background: white; border-radius: 6px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid #ccc; }
+        /* Cards con Tiempos */
+        .card { background: white; border-radius: 6px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid #ccc; position: relative; }
         .card.done { border-left-color: var(--green); }
         .card.rev { border-left-color: var(--blue); }
-        .timer-display { background: #f0f7ff; color: var(--blue); text-align: center; font-family: monospace; font-size: 1.3em; font-weight: bold; padding: 5px; margin: 8px 0; border-radius: 4px; }
         
+        .tag-st { position: absolute; top: 8px; right: 8px; font-size: 0.65em; font-weight: bold; color: #aaa; border: 1px solid #eee; padding: 2px 4px; border-radius: 3px; }
+        .timer-main { background: #f0f7ff; color: var(--blue); text-align: center; font-family: monospace; font-size: 1.4em; font-weight: bold; padding: 5px; margin: 8px 0; border-radius: 4px; }
+        
+        /* Grid de Tiempos Detallados (W, R, C) */
+        .grid-times { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; background: #f9f9f9; padding: 6px; border-radius: 4px; border: 1px solid #eee; margin-top: 5px; }
+        .time-box { text-align: center; font-size: 0.75em; font-family: monospace; color: #444; border-right: 1px solid #ddd; }
+        .time-box:last-child { border-right: none; }
+        .t-lbl { display: block; font-size: 0.7em; color: #999; font-weight: bold; margin-bottom: 2px; }
+
+        .pags-tag { text-align: center; font-weight: 900; margin-top: 8px; font-size: 1em; color: var(--green); }
+
         .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--green); color: white; border-radius: 50%; font-size: 30px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1001; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 25px; border-radius: 10px; width: 300px; }
@@ -50,22 +58,13 @@
     </div>
 
     <div class="stats-bar">
-        <div class="stat-item">
-            <span class="stat-label">BRS HOY</span>
-            <div class="stat-value" id="top-brs">0</div>
-        </div>
-        <div class="stat-item">
-            <span class="stat-label">PÁGINAS</span>
-            <div class="stat-value" id="top-pags">0</div>
-        </div>
-        <div class="stat-item">
-            <span class="stat-label">FECHA</span>
-            <input type="date" id="main-date" class="date-picker" onchange="render()">
-        </div>
+        <div class="stat-item"><span class="stat-label">BRS HOY</span><div class="stat-value" id="top-brs">0</div></div>
+        <div class="stat-item"><span class="stat-label">PÁGINAS</span><div class="stat-value" id="top-pags">0</div></div>
+        <div class="stat-item"><span class="stat-label">FECHA</span><input type="date" id="main-date" class="date-picker" onchange="render()"></div>
     </div>
 
     <div class="search-container">
-        <input type="text" id="search-input" class="search-box" placeholder="Buscar lote..." onkeyup="render()">
+        <input type="text" id="search-input" class="search-box" placeholder="🔍 Buscar por lote o línea..." onkeyup="render()">
     </div>
 
     <div class="workspace">
@@ -79,10 +78,10 @@
     <div id="modal-new" class="modal">
         <div class="modal-content">
             <h3>Nuevo Registro</h3>
-            <input type="text" id="new-id" placeholder="Lote" style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;">
-            <select id="new-line" style="width:100%; padding:10px; margin-bottom:20px; border-radius:5px; border:1px solid #ccc;"></select>
-            <button onclick="addBR()" style="width:100%; padding:12px; background:var(--green); color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">REGISTRAR</button>
-            <button onclick="hideModal()" style="width:100%; margin-top:10px; background:transparent; border:none; color:red; cursor:pointer;">Cancelar</button>
+            <input type="text" id="new-id" placeholder="Lote" style="width:100%; padding:10px; margin-bottom:10px;">
+            <select id="new-line" style="width:100%; padding:10px; margin-bottom:20px;"></select>
+            <button onclick="addBR()" style="width:100%; padding:12px; background:var(--green); color:white; border:none; border-radius:5px; font-weight:bold;">REGISTRAR</button>
+            <button onclick="hideModal()" style="width:100%; margin-top:10px; background:transparent; border:none; color:red;">Cancelar</button>
         </div>
     </div>
 
@@ -103,11 +102,9 @@
         const sel = document.getElementById('new-line');
         lineas.sort().forEach(l => sel.innerHTML += `<option value="${l}">${l}</option>`);
         
-        // Ajustar fecha inicial a HOY (formato local para evitar el salto de día UTC)
         const ahora = new Date();
         const offset = ahora.getTimezoneOffset() * 60000;
-        const hoyLocal = new Date(ahora - offset).toISOString().split('T')[0];
-        document.getElementById('main-date').value = hoyLocal;
+        document.getElementById('main-date').value = new Date(ahora - offset).toISOString().split('T')[0];
 
         rtdb.ref('recursos').on('value', snapshot => {
             const data = snapshot.val();
@@ -120,28 +117,34 @@
     function render() {
         const filterDate = document.getElementById('main-date').value;
         const searchText = document.getElementById('search-input').value.toLowerCase();
-        
         const lists = { wait: '', rev: '', done: '' };
         const counts = { wait: 0, rev: 0, done: 0 };
         let totalPags = 0, brsHoy = 0;
 
         db.forEach(l => {
-            // Filtro por Fecha y por Texto de búsqueda
             if (l.date === filterDate && (l.id.toLowerCase().includes(searchText) || l.line.toLowerCase().includes(searchText))) {
-                const col = l.st === 'done' ? 'done' : (l.st === 'wait' ? 'wait' : 'rev');
+                const isDone = l.st === 'done';
+                const col = isDone ? 'done' : (l.st === 'wait' ? 'wait' : 'rev');
                 counts[col]++;
 
-                if(l.st === 'done') {
-                    brsHoy++;
-                    totalPags += parseInt(l.pg || 0);
-                }
+                if(isDone) { brsHoy++; totalPags += parseInt(l.pg || 0); }
 
                 lists[col] += `
                     <div class="card ${l.st}">
+                        <div class="tag-st">${l.st === 'wait' ? 'S/T' : (isDone ? 'FIN' : 'TRB')}</div>
                         <div style="font-weight:bold;">${l.id}</div>
                         <div style="font-size:0.75em; color:#666; font-weight:bold;">${l.line} | ${l.user}</div>
-                        ${l.st === 'done' ? `<div style="color:var(--green); text-align:center; font-weight:bold; padding:5px;">FINALIZADO (PÁGS: ${l.pg})</div>` : 
-                                            `<div class="timer-display" id="live-${l.id}">${fmt(0)}</div>`}
+                        
+                        ${isDone ? `<div style="color:var(--green); text-align:center; font-weight:bold; padding:5px; border: 1px dashed;">FINALIZADO</div>` : 
+                                   `<div class="timer-main" id="live-${l.id}">${fmt(0)}</div>`}
+
+                        <div class="grid-times">
+                            <div class="time-box"><span class="t-lbl">W:</span>${fmt(l.tW)}</div>
+                            <div class="time-box"><span class="t-lbl">R:</span>${fmt(l.tR)}</div>
+                            <div class="time-box"><span class="t-lbl">C:</span>${fmt(l.tC)}</div>
+                        </div>
+
+                        ${isDone ? `<div class="pags-tag">PÁGS: ${l.pg}</div>` : ''}
                     </div>`;
             }
         });
@@ -152,8 +155,6 @@
         document.getElementById('count-wait').innerText = counts.wait;
         document.getElementById('count-rev').innerText = counts.rev;
         document.getElementById('count-done').innerText = counts.done;
-        
-        // Actualizar contadores superiores
         document.getElementById('top-brs').innerText = brsHoy;
         document.getElementById('top-pags').innerText = totalPags;
     }
@@ -162,16 +163,13 @@
         const id = document.getElementById('new-id').value.trim();
         const line = document.getElementById('new-line').value;
         const filterDate = document.getElementById('main-date').value;
-
         if(!id) return alert("Ingrese un lote");
 
         const nuevo = {
-            id, line, user: "POR DEFINIR", st: 'wait',
-            date: filterDate,
+            id, line, user: "POR DEFINIR", st: 'wait', date: filterDate,
             inicioWS: Date.now(), tW:0, tR:0, tC:0, tR_acumulado:0, tC_acumulado:0, pg:0,
             lastUpdate: Date.now()
         };
-
         await rtdb.ref('recursos/' + id).set(nuevo);
         hideModal();
         document.getElementById('new-id').value = "";
@@ -181,21 +179,19 @@
         const ahora = Date.now();
         db.forEach(l => {
             if (l.st === 'done') return;
-            let time = 0;
-            if (l.st === 'wait') time = ahora - l.inicioWS;
-            if (l.st === 'rev') time = (ahora - l.inicioRS) + (l.tR_acumulado || 0);
-            if (l.st === 'corr') time = (ahora - l.inicioCS) + (l.tC_acumulado || 0);
+            let t = 0;
+            if (l.st === 'wait') t = ahora - l.inicioWS;
+            if (l.st === 'rev') t = (ahora - l.inicioRS) + (l.tR_acumulado || 0);
+            if (l.st === 'corr') t = (ahora - l.inicioCS) + (l.tC_acumulado || 0);
             const el = document.getElementById(`live-${l.id}`);
-            if (el) el.innerText = fmt(time);
+            if (el) el.innerText = fmt(t);
         });
         document.getElementById('reloj').innerText = new Date().toLocaleTimeString();
     }
 
     function fmt(ms) {
         if (!ms || ms < 0) return "00:00";
-        const s = Math.floor(ms / 1000);
-        const m = Math.floor(s / 60);
-        const h = Math.floor(m / 60);
+        const s = Math.floor(ms / 1000), m = Math.floor(s / 60), h = Math.floor(m / 60);
         return h > 0 ? `${h}:${(m%60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}` : 
                        `${m.toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
     }
